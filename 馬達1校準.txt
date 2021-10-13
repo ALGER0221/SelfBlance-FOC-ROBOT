@@ -1,0 +1,38 @@
+import odrive
+import time
+
+motor_calibration_time = 10
+encoder_calibration_time = 15
+
+input("請確保電機沒有附載，不要試圖用手去碰輪子以免受傷")
+
+print("Searching for ODrive...")
+odrv0 = odrive.find_any()
+print("Odrive detected!")
+
+print("馬達即將運轉")
+odrv0.axis1.requested_state = 4
+time.sleep(motor_calibration_time)
+if odrv0.axis1.motor.is_calibrated == 1 and odrv0.axis1.motor.is_calibrated == 1:
+	print("馬達驅動成功!")
+else:
+	print("錯誤!檢查配置")
+	quit()
+print("Saving motor calibration")
+odrv0.axis1.motor.config.pre_calibrated = True
+odrv0.axis1.requested_state = 7 
+time.sleep(encoder_calibration_time)
+if odrv0.axis1.encoder.is_ready == 1 and odrv0.axis1.encoder.is_ready == 1:
+	print("編碼器校準成功!")
+else:
+	print("錯誤!檢查配置")
+	quit()
+print("儲存當前配置")	
+odrv0.axis1.encoder.config.pre_calibrated = True
+print("Reboot! it may take some time")
+odrv0.save_configuration()
+try:
+	odrv0.reboot()
+except:
+	print("馬達1校準完成") 
+	
